@@ -4,22 +4,28 @@ const fs = require('fs');
 const parse = require('csv-parse/lib/sync');
 const assert = require('assert');
 
-fs.readFile('data.csv', 'utf8', parseFile);
+// Read the specified file
+fs.readFile('data2.csv', 'utf8', parseFile);
+
+// Callback function for FS read.
+// Assume input file is CSV
+function parseFile(err, contents) {
+  const output = parse(contents, {
+    columns: true,
+    skip_empty_lines: true
+  });
+
+  // Call build function. Interpret and construct Org Chart
+  buildOutput(output);
+}
 
 function buildOutput(parsedInput) {
   let output = [];
-
-  // parsedInput.forEach((item) => {
-  //   item.depth = 5;
-  //   output.push(item);
-  // });
 
   output = parsedInput;
   
   // Assign depth values to the entire tree;
   findDepth(output[0], 0, output);
-
-  console.log(output);
 
   const basicOrgChart = printBasicOrgChart(output);
   console.log(basicOrgChart);
@@ -31,16 +37,6 @@ function buildOutput(parsedInput) {
 
     console.log("Basic Org Chart generted successfully!");
   })
-}
-
-
-function parseFile(err, contents) {
-  const output = parse(contents, {
-    columns: true,
-    skip_empty_lines: true
-  });
-
-  buildOutput(output);
 }
 
 function findDepth(row, currentDepth, data) {
@@ -107,5 +103,5 @@ function makePrintString(currentNode) {
     temp += ',';
   }
 
-  return temp + currentNode.empid + '\n';
+  return `${temp}"${currentNode.empid}\n${currentNode.name}\n${currentNode.position}"\n`;
 }
